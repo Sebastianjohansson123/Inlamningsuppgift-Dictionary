@@ -22,7 +22,8 @@ function App() {
     setSearchString(e.target.value);
   };
 
-  const handleSearch = async () => {
+  const handleSearch = async (e: any) => {
+    e.preventDefault();
     const res = await fetch(
       `https://api.dictionaryapi.dev/api/v2/entries/en/${searchString}`
     );
@@ -41,13 +42,15 @@ function App() {
   return (
     <>
       <div>
-        <input
-          onChange={handleChange}
-          placeholder="Search for a word"
-          type="text"
-        />
-        <button onClick={() => handleSearch()}>Search</button>
-        {error !== '' ? <p style={{ color: 'red' }}>{error}</p> : <></>}
+        <form onSubmit={handleSearch}>
+          <input
+            onChange={handleChange}
+            placeholder="Search for a word"
+            type="text"
+          />
+          <button type="submit">Search</button>
+          {error !== '' ? <p style={{ color: 'red' }}>{error}</p> : null}
+        </form>
       </div>
 
       <WordComponent searchResults={searchResults} />
