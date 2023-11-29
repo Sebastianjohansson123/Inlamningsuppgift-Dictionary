@@ -44,6 +44,7 @@ function App() {
       <div>
         <form onSubmit={handleSearch}>
           <input
+            value={searchString}
             onChange={handleChange}
             placeholder="Search for a word"
             type="text"
