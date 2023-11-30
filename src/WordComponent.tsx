@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import './wordComponent.css';
 
 const WordComponent = () => {
   const [searchString, setSearchString] = useState<string>('');
@@ -22,6 +23,7 @@ const WordComponent = () => {
 
   const handleSearch = async (e: any) => {
     e.preventDefault();
+    setSearchResults([]);
     const res = await fetch(
       `https://api.dictionaryapi.dev/api/v2/entries/en/${searchString}`
     );
@@ -37,94 +39,140 @@ const WordComponent = () => {
     }
   };
   return (
-    <>
-      <h1>Dictionary</h1>
-      <div>
+    <div className="container">
+      <h1 className="title">Dictionary</h1>
+      <div className="searchForm">
         <form onSubmit={handleSearch}>
           <input
+            className="searchInput"
             value={searchString}
             onChange={handleChange}
             placeholder="Search for a word"
             type="text"
           />
-          <button type="submit">Search</button>
-          {error !== '' ? <p style={{ color: 'red' }}>{error}</p> : null}
+          <button className="searchButton" type="submit">
+            Search
+          </button>
+          {error !== '' && <p className="errorMessage">{error}</p>}
         </form>
       </div>
+      <div className="resultsContainer">
+        {searchResults.length > 0 &&
+          searchResults.map((result, index) => (
+            <div key={index} className="result">
+              <h2>Search result for: {result.word}</h2>
+              {/* ... rest of your JSX */}
 
-      <div>
-        {searchResults.length > 0 ? (
-          <>
-            {searchResults.map((result, index) => (
-              <div key={index}>
-                <h2>Search result for: {result.word}</h2>
+              {/* Phonetics */}
+              <div className="box">
+                <h4>Phonetics</h4>
+                {result.phonetics.map(
+                  (p, index) =>
+                    p.text && (
+                      <div style={{ display: 'flex' }} key={index}>
+                        <img
+                          style={{
+                            objectFit: 'contain',
+                            marginRight: '1rem',
+                          }}
+                          src="circle-1.png"
+                          alt="circle"
+                        />
+                        <p>
+                          {p.text} {index + 1 < result.phonetics.length && ','}
+                        </p>
+                      </div>
+                    )
+                )}
+              </div>
 
-                {/* Phonetics */}
-                <div style={{ background: 'lightblue' }}>
-                  <h3>Phonetics</h3>
-                  {result.phonetics.map((p, index) => (
-                    <div key={index}>
-                      <p>Text: {p.text}</p>
-                    </div>
-                  ))}
+              <div>
+                <h4>
+                  How to pronounce: <b>{result.word}</b>
+                </h4>
+                <div className="audio">
+                  {result.phonetics.map(
+                    (p, index) =>
+                      p.audio !== '' && (
+                        <div key={index}>
+                          <audio style={{ display: 'flex' }} controls>
+                            <source src={p.audio} type="audio/mpeg" />
+                          </audio>
+                        </div>
+                      )
+                  )}
                 </div>
+              </div>
 
-                <div style={{ background: 'lightblue' }}>
-                  <h3>
-                    How to pronounce: <b>{result.word}</b>
-                  </h3>
-                  {result.phonetics.map((p, index) => (
-                    // Todo, ta bort dom som inte innehåller audio
-                    <div key={index}>
-                      <audio controls>
-                        <source src={p.audio} type="audio/mpeg" />
-                        Your browser does not support the audio element.
-                      </audio>
-                    </div>
-                  ))}
-                </div>
+              {/* Meanings */}
+              {result.meanings.map((meaning, index) => (
+                <div key={index}>
+                  <h3>Part of Speech: {meaning.partOfSpeech}</h3>
 
-                {/* Meanings */}
-                {result.meanings.map((meaning, index) => (
-                  <div key={index}>
-                    <h3>Part of Speech: {meaning.partOfSpeech}</h3>
-
-                    <div style={{ background: 'lightblue' }}>
-                      <h3>Definitions:</h3>
+                  <div className="box">
+                    <h4>Definitions:</h4>
+                    <div>
                       {meaning.definitions.map((def, index) => (
-                        <p key={index}>{def.definition}</p>
+                        <div key={index} style={{ display: 'flex' }}>
+                          <img
+                            style={{
+                              objectFit: 'contain',
+                              marginRight: '1rem',
+                            }}
+                            src="circle-1.png"
+                            alt="circle"
+                          />
+                          <p>{def.definition}</p>
+                        </div>
                       ))}
                     </div>
-
-                    {/* Synonyms */}
-                    {meaning.synonyms.length > 0 && (
-                      <div style={{ background: 'lightblue' }}>
-                        <h3>Synonyms</h3>
-                        {meaning.synonyms.map((synonym, index) => (
-                          <p key={index}>{synonym}</p>
-                        ))}
-                      </div>
-                    )}
-
-                    {/* Antonyms */}
-                    {meaning.antonyms.length > 0 && (
-                      <div style={{ background: 'lightblue' }}>
-                        <h3>Antonyms</h3>
-                        {meaning.antonyms.map((antonym, antonymIndex) => (
-                          <p key={antonymIndex}>{antonym}</p>
-                        ))}
-                      </div>
-                    )}
                   </div>
-                ))}
-              </div>
-            ))}
-          </>
-        ) : (
-          <></>
-        )}
+
+                  {/* Synonyms */}
+                  {meaning.synonyms.length > 0 && (
+                    <div className="box">
+                      <h4>Synonyms</h4>
+                      {meaning.synonyms.map((synonym, index) => (
+                        <div key={index} style={{ display: 'flex' }}>
+                          <img
+                            style={{
+                              objectFit: 'contain',
+                              marginRight: '1rem',
+                            }}
+                            src="circle-1.png"
+                            alt="circle"
+                          />
+                          <p key={index}>{synonym}</p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Antonyms */}
+                  {meaning.antonyms.length > 0 && (
+                    <div className="box">
+                      <h4>Antonyms</h4>
+                      {meaning.antonyms.map((antonym, index) => (
+                        <div key={index} style={{ display: 'flex' }}>
+                          <img
+                            style={{
+                              objectFit: 'contain',
+                              marginRight: '1rem',
+                            }}
+                            src="circle-1.png"
+                            alt="circle"
+                          />
+                          <p>{antonym}</p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          ))}
       </div>
-    </>
+    </div>
   );
 };
 
