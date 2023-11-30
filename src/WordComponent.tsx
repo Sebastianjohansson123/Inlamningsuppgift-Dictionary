@@ -69,7 +69,11 @@ const WordComponent = () => {
                 {result.phonetics.map(
                   (p, index) =>
                     p.text && (
-                      <div style={{ display: 'flex' }} key={index}>
+                      <div
+                        data-testid={'phoneticsDiv'}
+                        style={{ display: 'flex' }}
+                        key={index}
+                      >
                         <img
                           style={{
                             objectFit: 'contain',
@@ -95,7 +99,13 @@ const WordComponent = () => {
                     (p, index) =>
                       p.audio !== '' && (
                         <div key={index}>
-                          <audio style={{ display: 'flex' }} controls>
+                          <audio
+                            data-testid={`audio-${index}`}
+                            aria-label={'test audio'}
+                            // aria-label={`Audio for ${result.word}`}
+                            style={{ display: 'flex' }}
+                            controls
+                          >
                             <source src={p.audio} type="audio/mpeg" />
                           </audio>
                         </div>
@@ -110,7 +120,7 @@ const WordComponent = () => {
                   <h3>Part of Speech: {meaning.partOfSpeech}</h3>
 
                   <div className="box">
-                    <h4>Definitions:</h4>
+                    {/* <h4>Definitions:</h4> */}
                     <div>
                       {meaning.definitions.map((def, index) => (
                         <div key={index} style={{ display: 'flex' }}>
@@ -142,7 +152,7 @@ const WordComponent = () => {
                             src="circle-1.png"
                             alt="circle"
                           />
-                          <p key={index}>{synonym}</p>
+                          <p data-testid="synonyms">{synonym}</p>
                         </div>
                       ))}
                     </div>
@@ -162,7 +172,7 @@ const WordComponent = () => {
                             src="circle-1.png"
                             alt="circle"
                           />
-                          <p>{antonym}</p>
+                          <p data-testid="antonyms">{antonym}</p>
                         </div>
                       ))}
                     </div>
@@ -189,6 +199,7 @@ interface Definition {
   definitions: Array<{ definition: string }>;
   synonyms: string[];
   antonyms: string[];
+  interjections: string[];
 }
 
 interface SearchResult {

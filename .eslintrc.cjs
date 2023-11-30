@@ -12,8 +12,8 @@ module.exports = {
   rules: {
     'react-refresh/only-export-components': [
       'warn',
-      { allowConstantExport: true },
-      { allowAny: true },
+      { allowConstantExport: true, allowAny: true },
+      // { allowAny: true },
     ],
   },
 };
