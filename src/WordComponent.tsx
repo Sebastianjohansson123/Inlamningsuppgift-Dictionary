@@ -9,11 +9,15 @@ const WordComponent = ({ darkMode }: Props) => {
   const [searchString, setSearchString] = useState<string>('');
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [error, setError] = useState<string>('');
-  const [favoriteWords, setFavoriteWords] = useState<string[]>(
+  const [favoriteWords, setFavoriteWords] = useState<SearchResult[]>(
     localStorage.getItem('favoriteWords')
       ? JSON.parse(localStorage.getItem('favoriteWords')!)
       : []
   );
+
+  useEffect(() => {
+    console.log('favoriteWords:', favoriteWords);
+  }, [favoriteWords]);
 
   useEffect(() => {
     console.log('SearchResult:', searchResults);
@@ -25,7 +29,7 @@ const WordComponent = ({ darkMode }: Props) => {
       .then((data) => console.log('initial fetch:', data));
   }, []);
 
-  const addWord = (word: string) => {
+  const addWord = (word: any) => {
     if (favoriteWords.includes(word)) {
       const newFavoriteWords = favoriteWords.filter((w) => w !== word);
       setFavoriteWords(newFavoriteWords);
@@ -35,7 +39,7 @@ const WordComponent = ({ darkMode }: Props) => {
     }
   };
 
-  const deleteWord = (word: string) => {
+  const deleteWord = (word: any) => {
     const newFavoriteWords = favoriteWords.filter((w) => w !== word);
     setFavoriteWords(newFavoriteWords);
   };
@@ -80,9 +84,9 @@ const WordComponent = ({ darkMode }: Props) => {
         {favoriteWords.length > 0 ? (
           <div>
             <h3>🌸 Mina favoritare 🌸</h3>
-            {favoriteWords.map((w) => (
-              <div style={{ display: 'flex' }}>
-                <p>{w}</p>
+            {favoriteWords.map((w: any, index) => (
+              <div key={index} style={{ display: 'flex' }}>
+                <p onClick={() => setSearchResults([w])}>{w.word}</p>
                 <button className="deleteButton" onClick={() => deleteWord(w)}>
                   ❌
                 </button>
@@ -128,10 +132,10 @@ const WordComponent = ({ darkMode }: Props) => {
                 </h2>
                 <button
                   className="addButton"
-                  onClick={() => addWord(result.word)}
+                  onClick={() => addWord(result)}
                   data-testid="addToFavorites"
                 >
-                  {favoriteWords.includes(result.word) ? '♡' : '❤️'}
+                  {favoriteWords.includes(result) ? '♡' : '❤️'}
                   {/* ❤️ */}
                 </button>
               </div>
