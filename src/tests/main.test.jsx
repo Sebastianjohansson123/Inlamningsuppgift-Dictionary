@@ -74,7 +74,7 @@ describe('Tests against the API', () => {
 
   const verb = await waitFor(() => screen.getByText('Part of Speech: verb'))
   expect(verb).toBeInTheDocument();
-  
+
   const interjection = await waitFor(() => screen.getByText('Part of Speech: interjection'))
   expect(interjection).toBeInTheDocument();
 
@@ -87,7 +87,24 @@ describe('Tests against the API', () => {
   const synonyms = await waitFor(() => screen.getByTestId('synonyms'))
   expect(synonyms).toBeInTheDocument();
 
+
+
 })
 
 // Describe slutar här!
 })
+
+
+
+
+// kolla om knapp & input finns ✅
+// kolla om man ser header i det rätta ordet ✅
+// kolla om man hittar phonetics header ✅
+// kolla om man hittar phonetics div ✅
+// kolla om man hittar phonetics div children ✅
+// kolla om man hittar audio filer
+// kolla om man hittar part of speech (alla 3) ✅
+// kolla om man hittar synonyms header ✅
+// kolla om man hittar synonymer ✅
+// kolla om man ser ett error message 
+// se till så att error message inte hittas varken innan man söker eller efter man har gjort en fungerande sökning

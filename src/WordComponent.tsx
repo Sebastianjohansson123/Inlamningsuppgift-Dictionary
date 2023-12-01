@@ -102,7 +102,6 @@ const WordComponent = () => {
                           <audio
                             data-testid={`audio-${index}`}
                             aria-label={'test audio'}
-                            // aria-label={`Audio for ${result.word}`}
                             style={{ display: 'flex' }}
                             controls
                           >
@@ -120,7 +119,7 @@ const WordComponent = () => {
                   <h3>Part of Speech: {meaning.partOfSpeech}</h3>
 
                   <div className="box">
-                    {/* <h4>Definitions:</h4> */}
+                    <h4>Definitions:</h4>
                     <div>
                       {meaning.definitions.map((def, index) => (
                         <div key={index} style={{ display: 'flex' }}>
