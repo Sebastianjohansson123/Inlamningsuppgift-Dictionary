@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, test } from 'vitest';
 import App from '../App';
@@ -20,6 +20,17 @@ describe('Test that elements are rendered before using the API', () => {
     const button = screen.getByRole('button');
     expect(button).toBeInTheDocument();
     expect(button).toHaveTextContent('Search');
+  })
+
+  test('Make sure that submit works by pressing enter', async () => {
+    render(<WordComponent />);
+    const user = userEvent.setup();
+    const searchBar = screen.getByPlaceholderText('Search for a word');
+    await user.type(searchBar, 'hello', {delay: 1});
+    await user.type(searchBar, '{enter}');
+  
+    const result = await screen.findByText('Search result for: hello');
+    expect(result).toBeInTheDocument();
   })
 
 })
@@ -55,44 +66,43 @@ describe('Tests against the API', () => {
   expect(wordSearchedFor).toBeInTheDocument();
 
   // phonetics div
-  const phonenetics = await waitFor(() => screen.getAllByTestId('phoneticsDiv'));
-  expect(phonenetics[0]).toBeInTheDocument();
-
-  // phonetics header
-  const phoneticsHeader = await waitFor(() => screen.getByText('Phonetics'));
-  expect(phoneticsHeader).toBeInTheDocument();
+  const phoneneticsDiv = await waitFor(() => screen.getByTestId('phoneticsDiv')); // flytta ut diven och testa bara en div
+  expect(phoneneticsDiv).toBeInTheDocument();
 
   // phonetics text
-  const phoneticsText = await waitFor(() => phonenetics[0].firstChild);
+  const phoneticsText = await waitFor(() => phoneneticsDiv.firstChild);
   expect(phoneticsText).toBeInTheDocument();
 
-  // phonetics audio
-  const phoneticsAudio = await waitFor(() => screen.getByTestId('audio-0'));
+
+  const phoneticsHeader = await screen.findByText('Phonetics'); 
+  expect(phoneticsHeader).toBeInTheDocument();
+
+  const phoneticsAudio = await screen.findByTestId('audio-0');
   expect(phoneticsAudio).toBeInTheDocument();
 
-  const noun = await waitFor(() => screen.getByText('Part of Speech: noun'))
+  const noun = await screen.findByText('Part of Speech: noun')
   expect(noun).toBeInTheDocument();
 
-  const verb = await waitFor(() => screen.getByText('Part of Speech: verb'))
+  const verb = await screen.findByText('Part of Speech: verb')
   expect(verb).toBeInTheDocument();
 
-  const interjection = await waitFor(() => screen.getByText('Part of Speech: interjection'))
+  const interjection = await screen.findByText('Part of Speech: interjection')
   expect(interjection).toBeInTheDocument();
 
-  const nounDefinition = await waitFor(() => screen.getByText('"Hello!" or an equivalent greeting.'))
+  const nounDefinition = await screen.findByText('"Hello!" or an equivalent greeting.')
   expect(nounDefinition).toBeInTheDocument();
 
-  const synonymsHeader = await waitFor(() => screen.getByText('Synonyms'))
+  const synonymsHeader = await screen.findByText('Synonyms')
   expect(synonymsHeader).toBeInTheDocument();
 
-  const synonyms = await waitFor(() => screen.getByTestId('synonyms'))
+  const synonyms = await screen.findByTestId('synonyms') 
   expect(synonyms).toBeInTheDocument();
 
 
 
 })
 
-test('make sure that the error message isnt rendered before its supposed', async () => {
+test('make sure that the error message isnt rendered before its supposed to', async () => {
   render(<WordComponent />);
 
   const error = await waitFor(() => screen.queryByText('No results found, please try another word! 🙂')) 
@@ -137,44 +147,45 @@ expect(error).toBeInTheDocument();
 // Describe slutar här!
 })
 
-test('Make sure that the darkmode button works properly', async () => {
+
+  test('Make sure that the darkmode button works properly', async () => {
+    window.localStorage.clear();
+    render(<App />);
+    const user = userEvent.setup();
+    const darkModeButton = screen.getByRole('button' , {name: 'Toggle Light / dark mode'}) 
+    expect(darkModeButton).toBeInTheDocument();
+  
+    const dictionaryElement = screen.getByText('Dictionary');
+    expect(dictionaryElement).toHaveStyle('color: rgb(0, 0, 0)');
+  
+    await user.click(darkModeButton);
+    expect(dictionaryElement).toHaveStyle('color: rgb(255, 255, 255)');
+  })
+  
+  test('Make sure that the favourite words work properly', async () => {
   render(<App />);
   const user = userEvent.setup();
-  const darkModeButton = screen.getByRole('button' , {name: 'Toggle Light / dark mode'}) 
-  expect(darkModeButton).toBeInTheDocument();
+  const searchBar = screen.getByPlaceholderText('Search for a word');
+  await user.type(searchBar, 'hello');
+  
+  const searchButton = screen.getByRole('button' , {name: 'Search'})
+  await user.click(searchButton);
+  
+  const addToFavouritesButton = await waitFor(() => screen.getByRole('button', {name: '❤️'}) ) 
+  expect(addToFavouritesButton).toBeInTheDocument();
+  
+  await user.click(addToFavouritesButton);
+  
+  const favouritesHeader = await waitFor(() => screen.getByText('🌸 Mina favoritare 🌸'))
+  expect(favouritesHeader).toBeInTheDocument();
 
-  const dictionaryElement = screen.getByText('Dictionary');
-  expect(dictionaryElement).toHaveStyle('color: rgb(0, 0, 0)');
+  const favouritesDiv = await waitFor(() => screen.getByTestId('favoritesDiv'))
+  expect(favouritesDiv).toBeInTheDocument();
 
-  await user.click(darkModeButton);
-  expect(dictionaryElement).toHaveStyle('color: rgb(255, 255, 255)');
-})
-
-test('Make sure that the favourite words work properly', async () => {
-render(<App />);
-const user = userEvent.setup();
-const searchBar = screen.getByPlaceholderText('Search for a word');
-await user.type(searchBar, 'hello');
-
-const searchButton = screen.getByRole('button' , {name: 'Search'})
-await user.click(searchButton);
-
-
-// const addToFavouritesButton = await waitFor(() => screen.getByText('Add to favorites') ) 
-const addToFavouritesButton = await waitFor(() => screen.getByRole('button', {name: '❤️'}) ) 
-expect(addToFavouritesButton).toBeInTheDocument();
-
-await user.click(addToFavouritesButton);
-
-const favouritesHeader = await waitFor(() => screen.getByText('🌸 Mina favoritare 🌸'))
-expect(favouritesHeader).toBeInTheDocument();
-
-const favoritesDiv = await waitFor(() => screen.getByTestId('favoritesDiv'))
-
-expect(favoritesDiv).toBeInTheDocument();
-expect(favoritesDiv).toHaveTextContent('hello')
-})
-
+  const favoritesWord = await waitFor(() => within(favouritesDiv).queryByText('hello')) 
+  expect(favoritesWord).toBeInTheDocument();
+  
+  })
 
 
 

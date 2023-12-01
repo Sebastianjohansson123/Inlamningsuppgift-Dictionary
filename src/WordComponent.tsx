@@ -26,8 +26,17 @@ const WordComponent = ({ darkMode }: Props) => {
   }, []);
 
   const addWord = (word: string) => {
-    if (favoriteWords.includes(word)) return;
-    const newFavoriteWords = [...favoriteWords, word];
+    if (favoriteWords.includes(word)) {
+      const newFavoriteWords = favoriteWords.filter((w) => w !== word);
+      setFavoriteWords(newFavoriteWords);
+    } else {
+      const newFavoriteWords = [...favoriteWords, word];
+      setFavoriteWords(newFavoriteWords);
+    }
+  };
+
+  const deleteWord = (word: string) => {
+    const newFavoriteWords = favoriteWords.filter((w) => w !== word);
     setFavoriteWords(newFavoriteWords);
   };
 
@@ -72,7 +81,12 @@ const WordComponent = ({ darkMode }: Props) => {
           <div>
             <h3>🌸 Mina favoritare 🌸</h3>
             {favoriteWords.map((w) => (
-              <p>{w}</p>
+              <div style={{ display: 'flex' }}>
+                <p>{w}</p>
+                <button className="deleteButton" onClick={() => deleteWord(w)}>
+                  ❌
+                </button>
+              </div>
             ))}
           </div>
         ) : null}
@@ -117,35 +131,39 @@ const WordComponent = ({ darkMode }: Props) => {
                   onClick={() => addWord(result.word)}
                   data-testid="addToFavorites"
                 >
-                  ❤️
+                  {favoriteWords.includes(result.word) ? '♡' : '❤️'}
+                  {/* ❤️ */}
                 </button>
               </div>
 
               {/* Phonetics */}
               <div className="box">
                 <h4>Phonetics</h4>
-                {result.phonetics.map(
-                  (p, index) =>
-                    p.text && (
-                      <div
-                        data-testid={'phoneticsDiv'}
-                        style={{ display: 'flex' }}
-                        key={index}
-                      >
-                        <img
-                          style={{
-                            objectFit: 'contain',
-                            marginRight: '1rem',
-                          }}
-                          src="circle-1.png"
-                          alt="circle"
-                        />
-                        <p>
-                          {p.text} {index + 1 < result.phonetics.length && ','}
-                        </p>
-                      </div>
-                    )
-                )}
+                <div
+                  data-testid={'phoneticsDiv'}
+                  // style={{ display: 'flex' }}
+                  key={index}
+                >
+                  {result.phonetics.map(
+                    (p, index) =>
+                      p.text && (
+                        <div key={index} style={{ display: 'flex' }}>
+                          <img
+                            style={{
+                              objectFit: 'contain',
+                              marginRight: '1rem',
+                            }}
+                            src="circle-1.png"
+                            alt="circle"
+                          />
+                          <p>
+                            {p.text}
+                            {/* {index + 1 < result.phonetics.length && ','} */}
+                          </p>
+                        </div>
+                      )
+                  )}
+                </div>
               </div>
 
               <div>
