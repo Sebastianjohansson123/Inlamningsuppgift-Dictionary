@@ -1,10 +1,19 @@
 import { useEffect, useState } from 'react';
 import './wordComponent.css';
 
-const WordComponent = () => {
+type Props = {
+  darkMode: boolean;
+};
+
+const WordComponent = ({ darkMode }: Props) => {
   const [searchString, setSearchString] = useState<string>('');
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [error, setError] = useState<string>('');
+  const [favoriteWords, setFavoriteWords] = useState<string[]>(
+    localStorage.getItem('favoriteWords')
+      ? JSON.parse(localStorage.getItem('favoriteWords')!)
+      : []
+  );
 
   useEffect(() => {
     console.log('SearchResult:', searchResults);
@@ -15,6 +24,16 @@ const WordComponent = () => {
       .then((response) => response.json())
       .then((data) => console.log('initial fetch:', data));
   }, []);
+
+  const addWord = (word: string) => {
+    if (favoriteWords.includes(word)) return;
+    const newFavoriteWords = [...favoriteWords, word];
+    setFavoriteWords(newFavoriteWords);
+  };
+
+  useEffect(() => {
+    localStorage.setItem('favoriteWords', JSON.stringify(favoriteWords));
+  }, [favoriteWords]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
@@ -39,8 +58,25 @@ const WordComponent = () => {
     }
   };
   return (
-    <div className="container">
-      <h1 className="title">Dictionary</h1>
+    <div
+      style={{
+        color: darkMode ? 'white' : 'black',
+      }}
+      className="container"
+    >
+      <h1 style={{ color: darkMode ? 'white' : 'black' }} className="title">
+        Dictionary
+      </h1>
+      <div data-testid="favoritesDiv">
+        {favoriteWords.length > 0 ? (
+          <div>
+            <h3>🌸 Mina favoritare 🌸</h3>
+            {favoriteWords.map((w) => (
+              <p>{w}</p>
+            ))}
+          </div>
+        ) : null}
+      </div>
       <div className="searchForm">
         <form onSubmit={handleSearch}>
           <input
@@ -59,9 +95,31 @@ const WordComponent = () => {
       <div className="resultsContainer">
         {searchResults.length > 0 &&
           searchResults.map((result, index) => (
-            <div key={index} className="result">
-              <h2>Search result for: {result.word}</h2>
-              {/* ... rest of your JSX */}
+            <div
+              style={{
+                backgroundColor: darkMode ? 'grey' : ' #f5f5f5',
+                color: darkMode ? 'white' : 'black',
+              }}
+              key={index}
+              className="result"
+            >
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                <h2
+                  style={{
+                    color: darkMode ? 'white' : 'black',
+                    textAlign: 'center',
+                  }}
+                >
+                  Search result for: {result.word}
+                </h2>
+                <button
+                  className="addButton"
+                  onClick={() => addWord(result.word)}
+                  data-testid="addToFavorites"
+                >
+                  ❤️
+                </button>
+              </div>
 
               {/* Phonetics */}
               <div className="box">
@@ -207,8 +265,4 @@ interface SearchResult {
   phonetics: Phonetic[];
   meanings: Definition[];
   sourceUrls: string[];
-}
-
-interface Props {
-  searchResults: SearchResult[];
 }

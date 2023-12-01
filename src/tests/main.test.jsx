@@ -1,6 +1,7 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, test } from 'vitest';
+import App from '../App';
 import WordComponent from '../WordComponent';
 
 describe('Test that elements are rendered before using the API', () => {
@@ -134,6 +135,44 @@ expect(error).toBeInTheDocument();
 })
 
 // Describe slutar här!
+})
+
+test('Make sure that the darkmode button works properly', async () => {
+  render(<App />);
+  const user = userEvent.setup();
+  const darkModeButton = screen.getByRole('button' , {name: 'Toggle Light / dark mode'}) 
+  expect(darkModeButton).toBeInTheDocument();
+
+  const dictionaryElement = screen.getByText('Dictionary');
+  expect(dictionaryElement).toHaveStyle('color: rgb(0, 0, 0)');
+
+  await user.click(darkModeButton);
+  expect(dictionaryElement).toHaveStyle('color: rgb(255, 255, 255)');
+})
+
+test('Make sure that the favourite words work properly', async () => {
+render(<App />);
+const user = userEvent.setup();
+const searchBar = screen.getByPlaceholderText('Search for a word');
+await user.type(searchBar, 'hello');
+
+const searchButton = screen.getByRole('button' , {name: 'Search'})
+await user.click(searchButton);
+
+
+// const addToFavouritesButton = await waitFor(() => screen.getByText('Add to favorites') ) 
+const addToFavouritesButton = await waitFor(() => screen.getByRole('button', {name: '❤️'}) ) 
+expect(addToFavouritesButton).toBeInTheDocument();
+
+await user.click(addToFavouritesButton);
+
+const favouritesHeader = await waitFor(() => screen.getByText('🌸 Mina favoritare 🌸'))
+expect(favouritesHeader).toBeInTheDocument();
+
+const favoritesDiv = await waitFor(() => screen.getByTestId('favoritesDiv'))
+
+expect(favoritesDiv).toBeInTheDocument();
+expect(favoritesDiv).toHaveTextContent('hello')
 })
 
 
