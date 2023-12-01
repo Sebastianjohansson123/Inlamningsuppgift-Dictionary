@@ -189,3 +189,5 @@ expect(favoritesDiv).toHaveTextContent('hello')
 // kolla om man hittar synonymer ✅
 // kolla om man ser ett error message ✅
 // se till så att error message inte hittas varken innan man söker eller efter man har gjort en fungerande sökning ✅
+// se till att darkmode fungerar ✅
+// se till att favoritord-listan fungerar ✅
