@@ -91,6 +91,48 @@ describe('Tests against the API', () => {
 
 })
 
+test('make sure that the error message isnt rendered before its supposed', async () => {
+  render(<WordComponent />);
+
+  const error = await waitFor(() => screen.queryByText('No results found, please try another word! 🙂')) 
+  expect(error).not.toBeInTheDocument();
+
+  const user = userEvent.setup();
+  const searchBar = screen.getByPlaceholderText('Search for a word');
+  await user.type(searchBar, 'hello');
+
+  const button = screen.getByRole('button') && screen.getByText('Search');
+  await user.click(button);
+
+  const errorAfterSearch = await waitFor(() => screen.queryByText('No results found, please try another word! 🙂'))
+  expect(errorAfterSearch).not.toBeInTheDocument();
+})
+
+test('Make sure that the error message is shown when you search for a word that doesnt exist', async () => {
+render(<WordComponent />);
+const user = userEvent.setup(); 
+
+const searchBar = screen.getByPlaceholderText('Search for a word');
+await user.type(searchBar, 'öööö');
+
+const button = screen.getByRole('button') && screen.getByText('Search');
+await user.click(button);
+
+const error = await waitFor(() => screen.getByText('No results found, please try another word! 🙂'))
+expect(error).toBeInTheDocument();
+})
+
+test('Make sure that the error message is shown when you search for an empty string', async () => {
+render(<WordComponent />);
+const user = userEvent.setup(); 
+
+const button = screen.getByRole('button') && screen.getByText('Search');
+await user.click(button);
+
+const error = await waitFor(() => screen.getByText('No results found, please try another word! 🙂'))
+expect(error).toBeInTheDocument();
+})
+
 // Describe slutar här!
 })
 
@@ -106,5 +148,5 @@ describe('Tests against the API', () => {
 // kolla om man hittar part of speech (alla 3) ✅
 // kolla om man hittar synonyms header ✅
 // kolla om man hittar synonymer ✅
-// kolla om man ser ett error message 
-// se till så att error message inte hittas varken innan man söker eller efter man har gjort en fungerande sökning
+// kolla om man ser ett error message ✅
+// se till så att error message inte hittas varken innan man söker eller efter man har gjort en fungerande sökning ✅
