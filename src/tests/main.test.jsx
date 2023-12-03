@@ -1,30 +1,26 @@
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { afterAll, beforeAll, describe, expect, test } from 'vitest';
+import { afterAll, beforeAll, expect, test } from 'vitest';
 import App from '../App';
 import WordComponent from '../WordComponent';
 import { server } from '../mocks.node';
 
-server.listen();
+
+// We run these 3 rows to make sure that the tests are run towards the msw (mock server)
 beforeAll(() => server.listen())
 afterEach(() => server.resetHandlers())
 afterAll(() => server.close())
 
-server.events.on('request:start', ({ request }) => {
-  console.log('MSW intercepted:', request.method, request.url)
-})
 
-
-describe('Test that elements are rendered before using the API', () => {
 
   test('H1 is rendered', () => {
-    render(<WordComponent />);
-      const h1 = screen.getByText('Dictionary');
-      expect(h1).toBeInTheDocument();
-    });
+  render(<WordComponent />);
+    const h1 = screen.getByText('Dictionary');
+    expect(h1).toBeInTheDocument();
+  });
   
   test('Searchbar & Search button is rendered', () => {
-  render(<WordComponent />);
+    render(<WordComponent />);
     const searchbar = screen.getByPlaceholderText('Search for a word');
     expect(searchbar).toBeInTheDocument();
   
@@ -44,9 +40,8 @@ describe('Test that elements are rendered before using the API', () => {
     expect(result).toBeInTheDocument();
   })
 
-})
 
-describe('Tests against the API', () => {
+
   
   test('make sure that the api provides an answer', async () => {
     render(<WordComponent />);
@@ -109,8 +104,6 @@ describe('Tests against the API', () => {
   const synonyms = await screen.findByTestId('synonyms') 
   expect(synonyms).toBeInTheDocument();
 
-
-
 })
 
 test('make sure that the error message isnt rendered before its supposed to', async () => {
@@ -157,8 +150,6 @@ const error = await waitFor(() => screen.getByText('No results found, please try
 expect(error).toBeInTheDocument();
 })
 
-// Describe slutar här!
-})
 
 
   test('Make sure that the darkmode button works properly', async () => {

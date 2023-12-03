@@ -15,19 +15,10 @@ const WordComponent = ({ darkMode }: Props) => {
       : []
   );
 
+  // This useEffect makes sure that the favoriteWords are synced with localstorage
   useEffect(() => {
-    console.log('favoriteWords:', favoriteWords);
+    localStorage.setItem('favoriteWords', JSON.stringify(favoriteWords));
   }, [favoriteWords]);
-
-  useEffect(() => {
-    console.log('SearchResult:', searchResults);
-  }, [searchResults]);
-
-  useEffect(() => {
-    fetch('https://api.dictionaryapi.dev/api/v2/entries/en/hello')
-      .then((response) => response.json())
-      .then((data) => console.log('initial fetch:', data));
-  }, []);
 
   const addWord = (word: any) => {
     if (favoriteWords.includes(word)) {
@@ -43,10 +34,6 @@ const WordComponent = ({ darkMode }: Props) => {
     const newFavoriteWords = favoriteWords.filter((w) => w !== word);
     setFavoriteWords(newFavoriteWords);
   };
-
-  useEffect(() => {
-    localStorage.setItem('favoriteWords', JSON.stringify(favoriteWords));
-  }, [favoriteWords]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
@@ -164,10 +151,7 @@ const WordComponent = ({ darkMode }: Props) => {
                             src="circle-1.png"
                             alt="circle"
                           />
-                          <p>
-                            {p.text}
-                            {/* {index + 1 < result.phonetics.length && ','} */}
-                          </p>
+                          <p>{p.text}</p>
                         </div>
                       )
                   )}
@@ -271,6 +255,7 @@ const WordComponent = ({ darkMode }: Props) => {
 
 export default WordComponent;
 
+// This is the types of the data that we revieve from the API
 interface Phonetic {
   audio: string;
   text: string;
