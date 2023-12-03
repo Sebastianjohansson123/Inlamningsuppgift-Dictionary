@@ -3,6 +3,7 @@ import './App.css';
 import WordComponent from './WordComponent';
 
 function App() {
+  // This state is just a boolean value that controlls wether the app is in dark mode or not.
   const [darkMode, setDarkMode] = useState(
     localStorage.getItem('darkMode')
       ? JSON.parse(localStorage.getItem('darkMode')!)
