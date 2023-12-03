@@ -1,8 +1,19 @@
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, test } from 'vitest';
+import { afterAll, beforeAll, describe, expect, test } from 'vitest';
 import App from '../App';
 import WordComponent from '../WordComponent';
+import { server } from '../mocks.node';
+
+server.listen();
+beforeAll(() => server.listen())
+afterEach(() => server.resetHandlers())
+afterAll(() => server.close())
+
+server.events.on('request:start', ({ request }) => {
+  console.log('MSW intercepted:', request.method, request.url)
+})
+
 
 describe('Test that elements are rendered before using the API', () => {
 
@@ -136,6 +147,8 @@ expect(error).toBeInTheDocument();
 test('Make sure that the error message is shown when you search for an empty string', async () => {
 render(<WordComponent />);
 const user = userEvent.setup(); 
+const searchBar = screen.getByPlaceholderText('Search for a word');
+await user.clear(searchBar);
 
 const button = screen.getByRole('button') && screen.getByText('Search');
 await user.click(button);
@@ -187,9 +200,34 @@ expect(error).toBeInTheDocument();
   
   })
 
+test('Make sure that the favorites can be pressed to render a favorite word', async () => {
+  render(<App />);
+  const user = userEvent.setup();
+  const searchBar = screen.getByPlaceholderText('Search for a word');
+  await user.type(searchBar, 'hello');
 
-  // TODO:
+  const searchButton = screen.getByRole('button' , {name: 'Search'})
+  await user.click(searchButton);
 
-  // Lägg till test så att man kan klicka på sina favoritord
-  // Lägg till msw
-  
+  const addToFavouritesButton = await waitFor(() => screen.getByRole('button', {name: '❤️'}) )
+  await user.click(addToFavouritesButton);
+
+  await user.clear(searchBar);
+  await user.type(searchBar, 'ööö');
+  await user.click(searchButton);
+  expect(await screen.findByText('No results found, please try another word! 🙂')).toBeInTheDocument();
+
+  const favoritesDiv = await waitFor(() => screen.getByTestId('favoritesDiv'))
+  expect(favoritesDiv).toBeInTheDocument();
+
+  const favoritesDiv1 = await waitFor(() => screen.getByTestId('favoriteDiv0'))
+  expect(favoritesDiv1).toBeInTheDocument();
+
+  const favoritesWord = await waitFor(() => within(favoritesDiv1).queryByText('hello'))
+  expect(favoritesWord).toBeInTheDocument();
+
+  await user.click(favoritesWord);
+
+  const searchResultHeader = await waitFor(() => screen.getByText('Search result for: hello'))
+  expect(searchResultHeader).toBeInTheDocument();
+})

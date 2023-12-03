@@ -80,12 +80,16 @@ const WordComponent = ({ darkMode }: Props) => {
       <h1 style={{ color: darkMode ? 'white' : 'black' }} className="title">
         Dictionary
       </h1>
-      <div data-testid="favoritesDiv">
-        {favoriteWords.length > 0 ? (
-          <div>
-            <h3>🌸 Mina favoritare 🌸</h3>
+      {favoriteWords.length > 0 ? (
+        <>
+          <h3>🌸 Mina favoritare 🌸</h3>
+          <div data-testid="favoritesDiv">
             {favoriteWords.map((w: any, index) => (
-              <div key={index} style={{ display: 'flex' }}>
+              <div
+                data-testid={`favoriteDiv${index}`}
+                key={index}
+                style={{ display: 'flex' }}
+              >
                 <p onClick={() => setSearchResults([w])}>{w.word}</p>
                 <button className="deleteButton" onClick={() => deleteWord(w)}>
                   ❌
@@ -93,8 +97,8 @@ const WordComponent = ({ darkMode }: Props) => {
               </div>
             ))}
           </div>
-        ) : null}
-      </div>
+        </>
+      ) : null}
       <div className="searchForm">
         <form onSubmit={handleSearch}>
           <input
