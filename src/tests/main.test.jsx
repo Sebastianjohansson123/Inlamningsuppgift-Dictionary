@@ -186,3 +186,10 @@ expect(error).toBeInTheDocument();
   expect(favoritesWord).toBeInTheDocument();
   
   })
+
+
+  // TODO:
+
+  // Lägg till test så att man kan klicka på sina favoritord
+  // Lägg till msw
+  
